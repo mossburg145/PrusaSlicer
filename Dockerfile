@@ -38,6 +38,10 @@ RUN groupadd slic3r \
   && mkdir -p /Slic3r \
   && chown slic3r:slic3r /Slic3r
 
+WORKDIR /Slic3r
+ADD /files/getLatestPrusaSlicerRelease.sh /Slic3r
+RUN chmod +x /Slic3r/getLatestPrusaSlicerRelease.sh
+
 # Use baseimage-docker's init system
 #CMD ["/sbin/my_init"]
 
