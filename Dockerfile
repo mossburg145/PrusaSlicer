@@ -42,6 +42,28 @@ WORKDIR /Slic3r
 ADD /files/getLatestPrusaSlicerRelease.sh /Slic3r
 RUN chmod +x /Slic3r/getLatestPrusaSlicerRelease.sh
 
+RUN apt-get update && apt-get install -y \
+  jq \
+  curl \
+  ca-certificates \
+  unzip \
+  bzip2 \
+  git \
+  --no-install-recommends \
+  && latestSlic3r=$(/Slic3r/getLatestPrusaSlicerRelease.sh url) \
+  && slic3rReleaseName=$(/Slic3r/getLatestPrusaSlicerRelease.sh name) \
+  && curl -sSL ${latestSlic3r} > ${slic3rReleaseName} \
+  && rm -f /Slic3r/releaseInfo.json \
+  && mkdir -p /Slic3r/slic3r-dist \
+  && tar -xjf ${slic3rReleaseName} -C /Slic3r/slic3r-dist --strip-components 1 \
+  && rm -f /Slic3r/${slic3rReleaseName} \
+  && rm -rf /var/lib/apt/lists/* \
+  && apt-get purge -y --auto-remove jq unzip bzip2 \
+  && apt-get autoclean \
+  && chown -R slic3r:slic3r /Slic3r /home/slic3r
+
+COPY /files/LICENSE-slic3r /
+
 # Use baseimage-docker's init system
 #CMD ["/sbin/my_init"]
 
